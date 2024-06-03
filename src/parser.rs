@@ -185,6 +185,8 @@ impl Library {
         let mut doc_deprecated = None;
         let mut union_count = 1;
 
+        warn!("Class: {c_type:?}");
+
         parser.elements(|parser, elem| match elem.name() {
             "constructor" | "function" | "method" => {
                 self.read_function_to_vec(parser, ns_id, elem, &mut fns)
@@ -1079,6 +1081,16 @@ impl Library {
             _ => Err(parser.unexpected_element(elem)),
         })?;
 
+        if let Some(ref gtk_get_property) = gtk_get_property {
+            if elem.attr("get-property").is_none() {
+                warn!("Method get-property: {gtk_get_property}");
+            }
+        }
+        if let Some(ref gtk_set_property) = gtk_set_property {
+            if elem.attr("set-property").is_none() {
+                warn!("Method set-property: {gtk_set_property}");
+            }
+        }
         let get_property = elem
             .attr("get-property")
             .map(ToString::to_string)
@@ -1415,6 +1427,24 @@ impl Library {
             }
             _ => Err(parser.unexpected_element(elem)),
         })?;
+
+        // if elem.attr("getter").is_none() && readable {
+        //     warn!("Property getter missing: {prop_name}");
+        // }
+        // if elem.attr("setter").is_none() && writable && !construct_only {
+        //     warn!("Property setter missing: {prop_name}");
+        // }
+
+        if let Some(ref gtk_getter) = gtk_getter {
+            if elem.attr("getter").is_none() {
+                warn!("Property getter missing: {gtk_getter}");
+            }
+        }
+        if let Some(ref gtk_setter) = gtk_setter {
+            if elem.attr("setter").is_none() {
+                warn!("Property setter missing: {gtk_setter}");
+            }
+        }
 
         let getter = elem.attr("getter").map(ToString::to_string).or(gtk_getter);
         let setter = elem.attr("setter").map(ToString::to_string).or(gtk_setter);
