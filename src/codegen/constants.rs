@@ -37,7 +37,7 @@ pub fn generate(env: &Env, root_path: &Path, mod_rs: &mut Vec<String>) {
                 doc_alias(w, &constant.glib_name, "", 0)?;
                 writeln!(
                     w,
-                    "pub static {name}: &GStr = unsafe{{GStr::from_utf8_with_nul_unchecked({sys_crate_name}::{c_id})}};",
+                    "pub static {name}: &GStr = {sys_crate_name}::{c_id};",
                     sys_crate_name = sys_crate_name,
                     name = constant.name,
                     c_id = constant.glib_name
